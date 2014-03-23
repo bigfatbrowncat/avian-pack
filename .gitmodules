@@ -1,0 +1,30 @@
+[submodule "android/libcore"]
+	path = android/libcore
+	url = ../avian-pack.android.libcore.git
+[submodule "android/bionic"]
+	path = android/bionic
+	url = ../avian-pack.android.bionic.git
+[submodule "android/libnativehelper"]
+	path = android/libnativehelper
+	url = ../avian-pack.android.libnativehelper.git
+[submodule "android/openssl-upstream"]
+	path = android/openssl-upstream
+	url = ../avian-pack.android.openssl-upstream.git
+[submodule "android/system/core"]
+	path = android/system/core
+	url = ../avian-pack.android.system.core.git
+[submodule "android/external/fdlibm"]
+	path = android/external/fdlibm
+	url = ../avian-pack.android.external.fdlibm.git
+[submodule "android/external/icu4c"]
+	path = android/external/icu4c
+	url = ../avian-pack.android.external.icu4c.git
+[submodule "android/external/openssl"]
+	path = android/external/openssl
+	url = ../avian-pack.android.external.openssl.git
+[submodule "android/external/zlib"]
+	path = android/external/zlib
+	url = ../avian-pack.android.external.zlib.git
+[submodule "avian"]
+	path = avian
+	url = ../avian-pack.avian
