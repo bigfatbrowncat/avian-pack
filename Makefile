@@ -4,7 +4,7 @@ ifndef ARCH
 endif
 
 ifeq ($(UNAME), Darwin)	# OS X
-  $(shell export JAVA_HOME=`/usr/libexec/java_home`)
+  JAVA_HOME=$(shell /usr/libexec/java_home)
   OPENSSL_CONFIG=./Configure darwin64-x86_64-cc
 else ifeq ($(OS) $(ARCH), Windows_NT x86_64)		# Windows 64bit
   OPENSSL_CONFIG=./Configure mingw64
@@ -14,7 +14,7 @@ endif
 
 
 avian: expat fdlibm icu4c openssl
-	(cd avian && make android=$$(pwd)/../android)
+	(cd avian && make JAVA_HOME=$(JAVA_HOME) android=$$(pwd)/../android)
 
 expat:
 	(cd android/external/expat && ./configure --enable-static && make)
