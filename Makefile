@@ -16,6 +16,8 @@ endif
 
 
 avian: expat fdlibm icu4c openssl
+	(cd android/external/zlib && cp -f ../../../patch/zlib/* .)
+	(cd android/libnativehelper && patch -p1 -N < ../../patch/libnativehelper_jni.h.win32.patch)
 	(cd avian && make JAVA_HOME="$(JAVA_HOME)" android=$$(pwd)/../android)
 
 expat:
@@ -28,7 +30,7 @@ fdlibm:
 	    && CFLAGS=-fPIC bash configure && make)
 icu4c:
 	(cd android/external/icu4c; \
-	   patch -N -p1 < ../../../patch/common_umutex.h.osx.patch; \
+	   patch -p1 -N < ../../../patch/icu4c_common_umutex.h.osx.patch; \
 	   dos2unix Makefile.in \
 	   && ./configure --enable-static && make)
 openssl:
@@ -42,7 +44,7 @@ openssl:
 	           fix_clang_build \
 	           tls12_digests \
 	           alpn; \
-	           do patch -N -p1 < ../external/openssl/patches/$$x.patch; done); \
+	           do patch -p1 -N < ../external/openssl/patches/$$x.patch; done); \
 	   dos2unix Makefile.org \
 	   && $(OPENSSL_CONFIG) && make)
 
