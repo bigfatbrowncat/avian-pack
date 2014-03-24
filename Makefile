@@ -16,7 +16,7 @@ endif
 
 
 avian: expat fdlibm icu4c openssl
-	(cd avian && make JAVA_HOME=$(JAVA_HOME) android=$$(pwd)/../android)
+	(cd avian && make JAVA_HOME="$(JAVA_HOME)" android=$$(pwd)/../android)
 
 expat:
 	(cd android/external/expat \
