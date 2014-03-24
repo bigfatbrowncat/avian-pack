@@ -6,54 +6,68 @@ endif
 ifeq ($(UNAME), Darwin)	# OS X
   JAVA_HOME=$(shell /usr/libexec/java_home)
   OPENSSL_CONFIG=./Configure darwin64-x86_64-cc
-  ARCH=x86_64
 else ifeq ($(OS) $(ARCH), Windows_NT x86_64)		# Windows 64bit
   OPENSSL_CONFIG=./Configure mingw64
-  ARCH=x86_64
-else ifeq ($(OS) $(ARCH), Windows_NT x86)			# Windows 32bit
+else ifeq ($(OS) $(ARCH), Windows_NT i686)			# Windows 32bit
   OPENSSL_CONFIG=./Configure mingw
-  ARCH=x86
-else ifeq ($(ARCH), x86_64)		# anything other 64bit
-  OPENSSL_CONFIG=./config
-  ARCH=x86_64
 else
   OPENSSL_CONFIG=./config
-  ARCH=x86
 endif
 
-
 avian: expat fdlibm icu4c openssl
-	(cd android/external/zlib && cp -f ../../../patch/zlib/* .)
-	(cd android/libnativehelper && patch -p1 -N < ../../patch/libnativehelper_jni.h.win32.patch)
+	(cd android/external/zlib && cp -f ../../../patch/zlib/* .); \
+	(cd android/libnativehelper && patch -p1 -N < ../../patch/libnativehelper_jni.h.win32.patch); \
 	(cd avian && make JAVA_HOME="$(JAVA_HOME)" arch=$(ARCH) android=$$(pwd)/../android)
 
-expat:
-	(cd android/external/expat \
-	    && dos2unix expat_config.h.in \
-		&& ./configure --enable-static && make)
+android/external/expat/Makefile: android/external/expat/Makefile.in
+	( \
+	    cd android/external/expat && \
+	    dos2unix expat_config.h.in && \
+		./configure --enable-static; \
+	)
 
-fdlibm:
-	(cd android/external/fdlibm && (mv makefile.in Makefile.in || true) \
-	    && CFLAGS=-fPIC bash configure && make)
-icu4c:
-	(cd android/external/icu4c; \
-	   patch -p1 -N < ../../../patch/icu4c_common_umutex.h.osx.patch; \
-	   dos2unix Makefile.in \
-	   && ./configure --enable-static && make)
-openssl:
-	(cd android/openssl-upstream \
-	   && (for x in \
-	           progs \
-	           handshake_cutthrough \
-	           jsse \
-	           channelid \
-	           eng_dyn_dirs \
-	           fix_clang_build \
-	           tls12_digests \
-	           alpn; \
-	           do patch -p1 -N < ../external/openssl/patches/$$x.patch; done); \
-	   dos2unix Makefile.org \
-	   && $(OPENSSL_CONFIG) && make)
+expat: android/external/expat/Makefile
+	(cd android/external/expat; make)
+
+android/external/fdlibm/Makefile: android/external/fdlibm/makefile.in
+	( \
+	    cd android/external/fdlibm && \
+	    (mv makefile.in Makefile.in || true) && \
+		bash configure; \
+	)
+	
+fdlibm: android/external/fdlibm/Makefile
+	(cd android/external/fdlibm; make)
+
+android/external/icu4c/Makefile: android/external/icu4c/Makefile.in
+	( \
+	    cd android/external/icu4c && \
+	    patch -p1 -N < ../../../patch/icu4c_common_umutex.h.osx.patch; \
+	    dos2unix Makefile.in && \
+	    ./configure --enable-static; \
+	)
+
+icu4c: android/external/icu4c/Makefile
+	(cd android/external/icu4c; make)
+
+android/openssl-upstream/Makefile: android/openssl-upstream/Makefile.org
+	(cd android/openssl-upstream && \
+	    (for x in \
+	        progs \
+	        handshake_cutthrough \
+	        jsse \
+	        channelid \
+	        eng_dyn_dirs \
+	        fix_clang_build \
+	        tls12_digests \
+	        alpn; \
+	        do patch -p1 -N < ../external/openssl/patches/$$x.patch; \
+	    done); \
+	    dos2unix Makefile.org && $(OPENSSL_CONFIG); \
+	)
+
+openssl: android/openssl-upstream/Makefile
+	(cd android/openssl-upstream && make)
 
 clean: avian-clean fdlibm-clean icu4c-clean openssl-clean
 
@@ -71,3 +85,7 @@ icu4c-clean:
 
 openssl-clean:
 	(cd android/openssl-upstream; make clean)
+
+git-clean:
+	git submodule foreach git reset --hard HEAD
+	git submodule foreach git clean -f
