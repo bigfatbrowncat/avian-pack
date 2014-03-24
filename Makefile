@@ -8,6 +8,8 @@ ifeq ($(UNAME), Darwin)	# OS X
   OPENSSL_CONFIG=./Configure darwin64-x86_64-cc
 else ifeq ($(OS) $(ARCH), Windows_NT x86_64)		# Windows 64bit
   OPENSSL_CONFIG=./Configure mingw64
+else ifeq ($(OS) $(ARCH), Windows_NT x86)			# Windows 32bit
+  OPENSSL_CONFIG=./Configure mingw
 else 												# anything other
   OPENSSL_CONFIG=./config
 endif
@@ -17,7 +19,9 @@ avian: expat fdlibm icu4c openssl
 	(cd avian && make JAVA_HOME=$(JAVA_HOME) android=$$(pwd)/../android)
 
 expat:
-	(cd android/external/expat && ./configure --enable-static && make)
+	(cd android/external/expat \
+	    && dos2unix expat_config.h.in \
+		&& ./configure --enable-static && make)
 
 fdlibm:
 	(cd android/external/fdlibm && (mv makefile.in Makefile.in || true) \
@@ -25,7 +29,8 @@ fdlibm:
 icu4c:
 	(cd android/external/icu4c; \
 	   patch -N -p1 < ../../../patch/common_umutex.h.osx.patch; \
-	   ./configure --enable-static && make)
+	   dos2unix Makefile.in \
+	   && ./configure --enable-static && make)
 openssl:
 	(cd android/openssl-upstream \
 	   && (for x in \
@@ -38,7 +43,8 @@ openssl:
 	           tls12_digests \
 	           alpn; \
 	           do patch -N -p1 < ../external/openssl/patches/$$x.patch; done); \
-	   $(OPENSSL_CONFIG) && make)
+	   dos2unix Makefile.org \
+	   && $(OPENSSL_CONFIG) && make)
 
 clean: avian-clean fdlibm-clean icu4c-clean openssl-clean
 
