@@ -10,6 +10,7 @@ else ifeq ($(OS) $(ARCH), Windows_NT x86_64)		# Windows 64bit
   OPENSSL_CONFIG=./Configure mingw64
 else ifeq ($(OS) $(ARCH), Windows_NT i686)			# Windows 32bit
   OPENSSL_CONFIG=./Configure mingw
+  ARCH=i386
 else
   OPENSSL_CONFIG=./config
 endif
