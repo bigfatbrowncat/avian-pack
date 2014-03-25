@@ -6,24 +6,32 @@ endif
 ifeq ($(UNAME), Darwin)	# OS X
   JAVA_HOME=$(shell /usr/libexec/java_home)
   OPENSSL_CONFIG=./Configure darwin64-x86_64-cc
+  PLATFORM=osx
 else ifeq ($(OS) $(ARCH), Windows_NT x86_64)		# Windows 64bit
   OPENSSL_CONFIG=./Configure mingw64
+  PLATFORM=windows
 else ifeq ($(OS) $(ARCH), Windows_NT i686)			# Windows 32bit
   OPENSSL_CONFIG=./Configure mingw
   ARCH=i386
+  PLATFORM=windows
 else
   OPENSSL_CONFIG=./config
+  PLATFORM=unknown
 endif
 
 avian: expat fdlibm icu4c openssl
-	(cd android/external/zlib && cp -f ../../../patch/zlib/* .); \
-	(cd android/libnativehelper && patch -p1 -N < ../../patch/libnativehelper_jni.h.win32.patch); \
+ifeq ($(PLATFORM), windows)
+	(cd android/external/zlib && cp -f ../../../patch/zlib/* .)
+	(cd android/libnativehelper && patch -p1 -N < ../../patch/libnativehelper_jni.h.win32.patch)
+endif
 	(cd avian && make JAVA_HOME="$(JAVA_HOME)" arch=$(ARCH) android=$$(pwd)/../android)
 
 android/external/expat/Makefile: android/external/expat/Makefile.in
 	( \
 	    cd android/external/expat && \
+ifeq ($(PLATFORM), windows)
 	    dos2unix expat_config.h.in && \
+endif
 		./configure --enable-static; \
 	)
 
@@ -33,7 +41,7 @@ expat: android/external/expat/Makefile
 android/external/fdlibm/Makefile: android/external/fdlibm/makefile.in
 	( \
 	    cd android/external/fdlibm && \
-	    (mv makefile.in Makefile.in || true) && \
+	    (cp -f makefile.in Makefile.in || true) && \
 		bash configure; \
 	)
 	
@@ -41,12 +49,12 @@ fdlibm: android/external/fdlibm/Makefile
 	(cd android/external/fdlibm; make)
 
 android/external/icu4c/Makefile: android/external/icu4c/Makefile.in
-	( \
-	    cd android/external/icu4c && \
-	    patch -p1 -N < ../../../patch/icu4c_common_umutex.h.osx.patch; \
-	    dos2unix Makefile.in && \
-	    ./configure --enable-static; \
-	)
+ifeq ($(PLATFORM), osx)
+	(cd android/external/icu4c; patch -p1 -N < ../../../patch/icu4c_common_umutex.h.osx.patch;)
+else ifeq ($(PLATFORM), windows)
+	(cd android/external/icu4c; dos2unix Makefile.in;)
+endif
+	(cd android/external/icu4c; ./configure --enable-static;)
 
 icu4c: android/external/icu4c/Makefile
 	(cd android/external/icu4c; make)
@@ -63,9 +71,12 @@ android/openssl-upstream/Makefile: android/openssl-upstream/Makefile.org
 	        tls12_digests \
 	        alpn; \
 	        do patch -p1 -N < ../external/openssl/patches/$$x.patch; \
-	    done); \
-	    dos2unix Makefile.org && $(OPENSSL_CONFIG); \
+	    done) \
 	)
+ifeq ($(PLATFORM), windows)
+	(cd android/openssl-upstream && dos2unix Makefile.org;)
+endif
+	(cd android/openssl-upstream && $(OPENSSL_CONFIG);)
 
 openssl: android/openssl-upstream/Makefile
 	(cd android/openssl-upstream && make)
