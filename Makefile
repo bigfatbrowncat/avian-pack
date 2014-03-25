@@ -100,4 +100,4 @@ openssl-clean:
 
 git-clean:
 	git submodule foreach git reset --hard HEAD
-	git submodule foreach git clean -f
+	git submodule foreach git clean -f -d -x
