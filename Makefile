@@ -24,16 +24,13 @@ ifeq ($(PLATFORM), windows)
 	(cd android/external/zlib && cp -f ../../../patch/zlib/* .)
 	(cd android/libnativehelper && patch -p1 -N < ../../patch/libnativehelper_jni.h.win32.patch || true)
 endif
-	(cd avian && make JAVA_HOME="$(JAVA_HOME)" arch=$(ARCH) android=$$(pwd)/../android)
+	(cd avian && JAVA_HOME="$(JAVA_HOME)" make arch=$(ARCH) android=$$(pwd)/../android)
 
 android/external/expat/Makefile: android/external/expat/Makefile.in
-	( \
-	    cd android/external/expat && \
 ifeq ($(PLATFORM), windows)
-	    dos2unix expat_config.h.in && \
+	(cd android/external/expat && dos2unix expat_config.h.in)
 endif
-		./configure --enable-static; \
-	)
+	(cd android/external/expat && ./configure --enable-static)
 
 expat: android/external/expat/Makefile
 	(cd android/external/expat; make)
