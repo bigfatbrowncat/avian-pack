@@ -22,7 +22,7 @@ endif
 avian: expat fdlibm icu4c openssl
 ifeq ($(PLATFORM), windows)
 	(cd android/external/zlib && cp -f ../../../patch/zlib/* .)
-	(cd android/libnativehelper && patch -p1 -N < ../../patch/libnativehelper_jni.h.win32.patch)
+	(cd android/libnativehelper && patch -p1 -N < ../../patch/libnativehelper_jni.h.win32.patch || true)
 endif
 	(cd avian && make JAVA_HOME="$(JAVA_HOME)" arch=$(ARCH) android=$$(pwd)/../android)
 
