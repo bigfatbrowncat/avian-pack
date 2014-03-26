@@ -6,18 +6,52 @@ endif
 ifeq ($(UNAME), Darwin)	# OS X
   JAVA_HOME=$(shell /usr/libexec/java_home)
   OPENSSL_CONFIG=./Configure darwin64-x86_64-cc
+  AVIAN_PLATFORM_TAG = darwin-x86_64-android
   PLATFORM=osx
 else ifeq ($(OS) $(ARCH), Windows_NT x86_64)		# Windows 64bit
   OPENSSL_CONFIG=./Configure mingw64
+  AVIAN_PLATFORM_TAG = windows-x86_64-android
   PLATFORM=windows
 else ifeq ($(OS) $(ARCH), Windows_NT i686)			# Windows 32bit
   OPENSSL_CONFIG=./Configure mingw
+  AVIAN_PLATFORM_TAG = windows-i386-android
   ARCH=i386
   PLATFORM=windows
 else
   OPENSSL_CONFIG=./config
   PLATFORM=unknown
 endif
+
+ifeq ($(UNAME), Darwin)	# OS X
+  JAVA_HOME=$(shell /usr/libexec/java_home)
+  OPENSSL_CONFIG=./Configure darwin64-x86_64-cc
+  AVIAN_PLATFORM_TAG = darwin-x86_64-android
+  PLATFORM=osx
+else ifeq ($(UNAME) $(ARCH), Linux x86_64)		# linux on PC
+  OPENSSL_CONFIG=./config
+  PLATFORM_TAG = linux-x86_64
+  AVIAN_PLATFORM_TAG = linux-x86_64-android
+else ifeq ($(UNAME) $(ARCH), Linux armv6l)		# linux on Raspberry Pi
+  OPENSSL_CONFIG=./config
+  PLATFORM_TAG = linux-armv6l
+  AVIAN_PLATFORM_TAG = linux-armv6l-android
+else ifeq ($(OS) $(ARCH), Windows_NT i686)		# Windows 32
+  OPENSSL_CONFIG=./Configure mingw
+  AVIAN_PLATFORM_TAG = windows-i386-android
+  PLATFORM=windows
+else ifeq ($(OS) $(ARCH), Windows_NT x86_64)	# Windows 64
+  OPENSSL_CONFIG=./Configure mingw64
+  AVIAN_PLATFORM_TAG = windows-x86_64-android
+  PLATFORM=windows
+endif
+
+
+avian-static-lib: expat fdlibm icu4c openssl
+ifeq ($(PLATFORM), windows)
+	(cd android/external/zlib && cp -f ../../../patch/zlib/* .)
+	(cd android/libnativehelper && patch -p1 -N < ../../patch/libnativehelper_jni.h.win32.patch || true)
+endif
+	(cd avian && JAVA_HOME="$(JAVA_HOME)" make arch=$(ARCH) android=$$(pwd)/../android $$(pwd)/build/$(AVIAN_PLATFORM_TAG)/libavian.a)
 
 avian: expat fdlibm icu4c openssl
 ifeq ($(PLATFORM), windows)
