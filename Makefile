@@ -24,8 +24,6 @@ AVIAN_PLATFORM_TAG = $(PLATFORM_TAG)$(AVIAN_PLATFORM_SUFFIX)
 
 ifeq ($(CLASSPATH), android)
 
-avian-static-lib: expat fdlibm icu4c openssl
-
 avian: expat fdlibm icu4c openssl
 ifeq ($(PLATFORM), windows)
 	(cd android/external/zlib && cp -f ../../../patch/zlib/* .)
@@ -33,6 +31,7 @@ ifeq ($(PLATFORM), windows)
 endif
 	(cd avian && JAVA_HOME="$(JAVA_HOME)" make arch=$(ARCH) android=$$(pwd)/../android)
 
+avian-static-lib: expat fdlibm icu4c openssl
 ifeq ($(PLATFORM), windows)
 	(cd android/external/zlib && cp -f ../../../patch/zlib/* .)
 	(cd android/libnativehelper && patch -p1 -N < ../../patch/libnativehelper_jni.h.win32.patch || true)
@@ -134,3 +133,5 @@ git-clean:
 	git submodule foreach git clean -f -d -x
 	
 include ../common-scripts/ideconf/ideconf.mk
+
+.PHONY: avian avian-static-lib avian-classpath expat fdlibm icu4c openssl avian-clean expat-clean fdlibm-clean icu4c-clean openssl-clean git-clean
