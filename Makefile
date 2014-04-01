@@ -43,7 +43,7 @@ ifeq ($(PLATFORM), windows)
 	(cd android/external/zlib && cp -f ../../../patch/zlib/* .)
 	(cd android/libnativehelper && patch -p1 -N < ../../patch/libnativehelper_jni.h.win32.patch || true)
 endif
-	(cd avian && JAVA_HOME="$(JAVA_HOME)" make arch=$(ARCH) android=$$(pwd)/../android build/$(AVIAN_PLATFORM_TAG)/classpath.jar.a)
+	(cd avian && JAVA_HOME="$(JAVA_HOME)" make arch=$(ARCH) android=$$(pwd)/../android build/$(AVIAN_PLATFORM_TAG)/classpath.jar)
 	
 else
 
