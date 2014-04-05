@@ -1,26 +1,26 @@
 include ../common-scripts/globals.mk
 
 ifeq ($(UNAME), Darwin)							# OS X
-  OPENSSL_CONFIG="./Configure darwin64-x86_64-cc"
+  OPENSSL_CONFIG=./Configure darwin64-x86_64-cc
   PLATFORM=darwin
   CFLAGS=
   CXXFLAGS=
   CC="gcc -fPIC"
 else ifeq ($(UNAME), Linux)						# linux on PC
-  OPENSSL_CONFIG="./config"
+  OPENSSL_CONFIG=./config
   PLATFORM=linux
   CFLAGS=-fPIC
   CXXFLAGS=-fPIC
   CC="gcc -fPIC"
 else ifeq ($(OS) $(ARCH), Windows_NT i686)		# Windows 32
-  OPENSSL_CONFIG="./Configure mingw"
+  OPENSSL_CONFIG=./Configure mingw
   PLATFORM=windows
   CFLAGS=
   CXXFLAGS=
   ARCH=i386
   CC=gcc
 else ifeq ($(OS) $(ARCH), Windows_NT x86_64)	# Windows 64
-  OPENSSL_CONFIG="./Configure mingw64"
+  OPENSSL_CONFIG=./Configure mingw64
   PLATFORM=windows
   CFLAGS=
   CXXFLAGS=
