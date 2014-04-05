@@ -1,18 +1,30 @@
 include ../common-scripts/globals.mk
 
 ifeq ($(UNAME), Darwin)							# OS X
-  OPENSSL_CONFIG=./Configure darwin64-x86_64-cc
+  OPENSSL_CONFIG="./Configure darwin64-x86_64-cc"
   PLATFORM=darwin
+  CFLAGS=
+  CXXFLAGS=
+  CC="gcc -fPIC"
 else ifeq ($(UNAME), Linux)						# linux on PC
-  OPENSSL_CONFIG=./config
+  OPENSSL_CONFIG="./config"
   PLATFORM=linux
+  CFLAGS=-fPIC
+  CXXFLAGS=-fPIC
+  CC="gcc -fPIC"
 else ifeq ($(OS) $(ARCH), Windows_NT i686)		# Windows 32
-  OPENSSL_CONFIG=./Configure mingw
+  OPENSSL_CONFIG="./Configure mingw"
   PLATFORM=windows
+  CFLAGS=
+  CXXFLAGS=
   ARCH=i386
+  CC=gcc
 else ifeq ($(OS) $(ARCH), Windows_NT x86_64)	# Windows 64
-  OPENSSL_CONFIG=./Configure mingw64
+  OPENSSL_CONFIG="./Configure mingw64"
   PLATFORM=windows
+  CFLAGS=
+  CXXFLAGS=
+  CC=gcc
 endif
 
 ifeq ($(CLASSPATH), android)
@@ -63,7 +75,7 @@ android/external/expat/Makefile: android/external/expat/Makefile.in
 ifeq ($(PLATFORM), windows)
 	(cd android/external/expat && dos2unix expat_config.h.in)
 endif
-	(cd android/external/expat && ./configure --enable-static)
+	(cd android/external/expat && CFLAGS="$(CFLAGS)" CXXFLAGS="$(CXXFLAGS)" ./configure --enable-static)
 
 expat: android/external/expat/Makefile
 	(cd android/external/expat; make)
@@ -72,9 +84,9 @@ android/external/fdlibm/Makefile: android/external/fdlibm/makefile.in
 	( \
 	    cd android/external/fdlibm && \
 	    (cp -f makefile.in Makefile.in || true) && \
-		bash configure; \
+		CFLAGS="$(CFLAGS)" CXXFLAGS="$(CXXFLAGS)" bash configure; \
 	)
-	
+
 fdlibm: android/external/fdlibm/Makefile
 	(cd android/external/fdlibm; make)
 
@@ -84,7 +96,7 @@ ifeq ($(PLATFORM), darwin)
 else ifeq ($(PLATFORM), windows)
 	(cd android/external/icu4c; dos2unix Makefile.in;)
 endif
-	(cd android/external/icu4c; ./configure --enable-static;)
+	(cd android/external/icu4c; CFLAGS="$(CFLAGS)" CXXFLAGS="$(CXXFLAGS)" ./configure --enable-static;)
 
 icu4c: android/external/icu4c/Makefile
 	(cd android/external/icu4c; make)
@@ -106,7 +118,7 @@ android/openssl-upstream/Makefile: android/openssl-upstream/Makefile.org
 ifeq ($(PLATFORM), windows)
 	(cd android/openssl-upstream && dos2unix Makefile.org;)
 endif
-	(cd android/openssl-upstream && $(OPENSSL_CONFIG);)
+	(cd android/openssl-upstream && CC=$(CC) $(OPENSSL_CONFIG);)
 
 openssl: android/openssl-upstream/Makefile
 	(cd android/openssl-upstream && make)
@@ -130,7 +142,7 @@ openssl-clean:
 
 git-clean:
 	git submodule foreach git reset --hard HEAD
-	git submodule foreach git clean -f -d -x
+	git submodule foreach git clean -f -d
 	
 include ../common-scripts/ideconf/ideconf.mk
 
