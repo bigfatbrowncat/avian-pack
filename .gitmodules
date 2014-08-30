@@ -38,3 +38,6 @@
 	path = avian
 	url = ../avian-pack.avian
 	branch = avian-pack
+[submodule "android/external/conscrypt"]
+	path = android/external/conscrypt
+	url = /Users/il/Projects/zetes-examples/zetes/avian-pack/android/external/conscrypt
