@@ -93,18 +93,11 @@ icu4c: android/external/icu4c/Makefile
 
 android/openssl-upstream/Makefile: android/openssl-upstream/Makefile.org
 	(cd android/openssl-upstream && \
-	    (for x in \
-	        progs \
-	        handshake_cutthrough \
-	        jsse \
-	        channelid \
-	        eng_dyn_dirs \
-	        fix_clang_build \
-	        tls12_digests \
-	        alpn; \
-	        do patch -p1 -N < ../external/openssl/patches/$$x.patch; \
+	    (for x in ../external/openssl/patches/*.patch; \
+	        do patch -p1 < $x; \
 	    done) \
 	)
+   
 ifeq ($(PLATFORM), windows)
 	(cd android/openssl-upstream && dos2unix Makefile.org;)
 endif
