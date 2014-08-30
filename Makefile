@@ -94,7 +94,7 @@ icu4c: android/external/icu4c/Makefile
 android/openssl-upstream/Makefile: android/openssl-upstream/Makefile.org
 	(cd android/openssl-upstream && \
 	    (for x in ../external/openssl/patches/*.patch; \
-	        do patch -p1 < $x; \
+	        do patch -p1 < $$x; \
 	    done) \
 	)
    
