@@ -82,7 +82,6 @@ fdlibm: android/external/fdlibm/Makefile
 
 android/external/icu4c/Makefile: android/external/icu4c/Makefile.in
 ifeq ($(PLATFORM), darwin)
-	(cd android/external/icu4c; patch -p1 -N < ../../../patch/icu4c_common_umutex.h.osx.patch;)
 else ifeq ($(PLATFORM), windows)
 	(cd android/external/icu4c; dos2unix Makefile.in;)
 endif
