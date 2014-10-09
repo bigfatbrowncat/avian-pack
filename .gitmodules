@@ -38,3 +38,6 @@
 	path = avian
 	url = ../avian-pack.avian
 	branch = avian-pack
+[submodule "android/external/conscrypt"]
+	path = android/external/conscrypt
+	url = ../avian-pack.android.external.conscrypt.git
