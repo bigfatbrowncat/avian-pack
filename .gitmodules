@@ -41,3 +41,9 @@
 [submodule "android/external/conscrypt"]
 	path = android/external/conscrypt
 	url = ../avian-pack.android.external.conscrypt.git
+[submodule "android/external/bouncycastle"]
+	path = android/external/bouncycastle
+	url = https://bigfatbrowncat@github.com/bigfatbrowncat/avian-pack.android.external.bouncycastle.git
+[submodule "android/external/okhttp"]
+	path = android/external/okhttp
+	url = https://bigfatbrowncat@github.com/bigfatbrowncat/avian-pack.android.external.okhttp.git
