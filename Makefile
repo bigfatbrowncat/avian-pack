@@ -131,8 +131,11 @@ icu4c-clean:
 openssl-clean:
 	(cd android/openssl-upstream; make clean)
 
+git-refresh: git-clean
+	git submodule update --init --recursive --force
+
 git-clean:
 	git submodule foreach git reset --hard HEAD
 	git submodule foreach git clean -f -d
 
-.PHONY: avian avian-static-lib avian-classpath expat fdlibm icu4c openssl avian-clean expat-clean fdlibm-clean icu4c-clean openssl-clean git-clean
+.PHONY: avian avian-static-lib avian-classpath git-refresh git-clean expat fdlibm icu4c openssl avian-clean expat-clean fdlibm-clean icu4c-clean openssl-clean git-clean
