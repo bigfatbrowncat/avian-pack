@@ -1,6 +1,15 @@
-include ../common-scripts/globals.mk
+UNAME := $(shell uname)
+
+ifndef CLASSPATH
+  CLASSPATH := android
+endif
+
+ifndef ARCH
+  ARCH := $(shell uname -m)
+endif
 
 ifeq ($(UNAME), Darwin)							# OS X
+  JAVA_HOME=$(shell /usr/libexec/java_home)
   OPENSSL_CONFIG=./Configure darwin64-x86_64-cc
   CFLAGS=
   CXXFLAGS=
@@ -125,7 +134,5 @@ openssl-clean:
 git-clean:
 	git submodule foreach git reset --hard HEAD
 	git submodule foreach git clean -f -d
-	
-include ../common-scripts/ideconf/ideconf.mk
 
 .PHONY: avian avian-static-lib avian-classpath expat fdlibm icu4c openssl avian-clean expat-clean fdlibm-clean icu4c-clean openssl-clean git-clean
