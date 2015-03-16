@@ -23,6 +23,10 @@ else ifeq ($(OS) $(ARCH), Windows_NT x86_64)	# Windows 64
   CC=gcc
 endif
 
+AVIAN_ARCH=$(ARCH)
+ifeq ($(AVIAN_ARCH), armv6l)   # Raspberry Pi
+  AVIAN_ARCH=arm
+endif
 
 ifeq ($(CLASSPATH), android)
 
@@ -31,32 +35,32 @@ ifeq ($(PLATFORM), windows)
 	(cd android/external/zlib && cp -f ../../../patch/zlib/* .)
 	(cd android/libnativehelper && patch -p1 -N < ../../patch/libnativehelper_jni.h.win32.patch || true)
 endif
-	(cd avian && JAVA_HOME="$(JAVA_HOME)" make arch=$(ARCH) android=$$(pwd)/../android)
+	(cd avian && JAVA_HOME="$(JAVA_HOME)" make arch=$(AVIAN_ARCH) android=$$(pwd)/../android)
 
 avian-static-lib: expat fdlibm icu4c openssl
 ifeq ($(PLATFORM), windows)
 	(cd android/external/zlib && cp -f ../../../patch/zlib/* .)
 	(cd android/libnativehelper && patch -p1 -N < ../../patch/libnativehelper_jni.h.win32.patch || true)
 endif
-	(cd avian && JAVA_HOME="$(JAVA_HOME)" make arch=$(ARCH) android=$$(pwd)/../android build/$(AVIAN_PLATFORM_TAG)/libavian.a)
+	(cd avian && JAVA_HOME="$(JAVA_HOME)" make arch=$(AVIAN_ARCH) android=$$(pwd)/../android build/$(AVIAN_PLATFORM_TAG)/libavian.a)
 
 avian-classpath: expat fdlibm icu4c openssl
 ifeq ($(PLATFORM), windows)
 	(cd android/external/zlib && cp -f ../../../patch/zlib/* .)
 	(cd android/libnativehelper && patch -p1 -N < ../../patch/libnativehelper_jni.h.win32.patch || true)
 endif
-	(cd avian && JAVA_HOME="$(JAVA_HOME)" make arch=$(ARCH) android=$$(pwd)/../android build/$(AVIAN_PLATFORM_TAG)/classpath.jar)
+	(cd avian && JAVA_HOME="$(JAVA_HOME)" make arch=$(AVIAN_ARCH) android=$$(pwd)/../android build/$(AVIAN_PLATFORM_TAG)/classpath.jar)
 	
 else
 
 avian:
-	(cd avian && JAVA_HOME="$(JAVA_HOME)" make arch=$(ARCH))
+	(cd avian && JAVA_HOME="$(JAVA_HOME)" make arch=$(AVIAN_ARCH))
 
 avian-static-lib:
-	(cd avian && JAVA_HOME="$(JAVA_HOME)" make arch=$(ARCH) build/$(AVIAN_PLATFORM_TAG)/libavian.a)
+	(cd avian && JAVA_HOME="$(JAVA_HOME)" make arch=$(AVIAN_ARCH) build/$(AVIAN_PLATFORM_TAG)/libavian.a)
 
 avian-classpath:
-	(cd avian && JAVA_HOME="$(JAVA_HOME)" make arch=$(ARCH) build/$(AVIAN_PLATFORM_TAG)/classpath.jar)
+	(cd avian && JAVA_HOME="$(JAVA_HOME)" make arch=$(AVIAN_ARCH) build/$(AVIAN_PLATFORM_TAG)/classpath.jar)
 
 endif
 	
