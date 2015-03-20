@@ -14,28 +14,48 @@ ifeq ($(UNAME), Darwin)							# OS X
   CFLAGS=
   CXXFLAGS=
   CC="gcc -fPIC"
+  # In Avian Darwin is now macosx or ios. We use macosx
+  AVIAN_PLATFORM_TAG_PART=macosx-x86_64
 else ifeq ($(UNAME), Linux)						# linux on PC
   OPENSSL_CONFIG=./config
   CFLAGS=-fPIC
   CXXFLAGS=-fPIC
   CC="gcc -fPIC"
+  ifeq ($(ARCH), x86_64)
+    AVIAN_PLATFORM_TAG_PART=linux-x86_64
+  else ifeq ($(ARCH), armv6l)
+    AVIAN_PLATFORM_TAG=linux-arm
+  else
+    AVIAN_PLATFORM_TAG=linux-unknown
+  endif
 else ifeq ($(OS) $(ARCH), Windows_NT i686)		# Windows 32
   OPENSSL_CONFIG=./Configure mingw
   CFLAGS=
   CXXFLAGS=
   ARCH=i386
   CC=gcc
+  AVIAN_PLATFORM_TAG_PART=windows-i386
 else ifeq ($(OS) $(ARCH), Windows_NT x86_64)	# Windows 64
   OPENSSL_CONFIG=./Configure mingw64
   CFLAGS=
   CXXFLAGS=
   CC=gcc
+  AVIAN_PLATFORM_TAG_PART=windows-x86_64
 endif
 
-AVIAN_ARCH=$(ARCH)
+AVIAN_ARCH := $(ARCH)
 ifeq ($(AVIAN_ARCH), armv6l)   # Raspberry Pi
-  AVIAN_ARCH=arm
+  AVIAN_ARCH := arm
 endif
+
+ifeq ($(CLASSPATH), android)
+  AVIAN_PLATFORM_SUFFIX := -android
+else
+  AVIAN_PLATFORM_SUFFIX :=
+endif
+
+AVIAN_PLATFORM_TAG := $(AVIAN_PLATFORM_TAG_PART)$(AVIAN_PLATFORM_SUFFIX)
+
 
 ifeq ($(CLASSPATH), android)
 
