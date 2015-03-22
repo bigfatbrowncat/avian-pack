@@ -17,6 +17,7 @@ ifeq ($(UNAME), Darwin)							# OS X
   # In Avian Darwin is now macosx or ios. We use macosx
   AVIAN_PLATFORM_TAG_PART=macosx-x86_64
 else ifeq ($(UNAME), Linux)						# linux on PC
+  JAVA_HOME=$(shell readlink -f `which javac` | sed "s:bin/javac::")
   OPENSSL_CONFIG=./config
   CFLAGS=-fPIC
   CXXFLAGS=-fPIC
@@ -24,9 +25,9 @@ else ifeq ($(UNAME), Linux)						# linux on PC
   ifeq ($(ARCH), x86_64)
     AVIAN_PLATFORM_TAG_PART=linux-x86_64
   else ifeq ($(ARCH), armv6l)
-    AVIAN_PLATFORM_TAG=linux-arm
+    AVIAN_PLATFORM_TAG_PART=linux-arm
   else
-    AVIAN_PLATFORM_TAG=linux-unknown
+    AVIAN_PLATFORM_TAG_PART=linux-unknown
   endif
 else ifeq ($(OS) $(ARCH), Windows_NT i686)		# Windows 32
   OPENSSL_CONFIG=./Configure mingw
