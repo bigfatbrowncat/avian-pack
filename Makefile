@@ -61,21 +61,21 @@ AVIAN_PLATFORM_TAG := $(AVIAN_PLATFORM_TAG_PART)$(AVIAN_PLATFORM_SUFFIX)
 ifeq ($(CLASSPATH), android)
 
 avian: expat fdlibm icu4c openssl
-ifeq ($(PLATFORM), windows)
+ifeq ($(OS), Windows_NT)
 	(cd android/external/zlib && cp -f ../../../patch/zlib/* .)
 	(cd android/libnativehelper && patch -p1 -N < ../../patch/libnativehelper_jni.h.win32.patch || true)
 endif
 	(cd avian && JAVA_HOME="$(JAVA_HOME)" make arch=$(AVIAN_ARCH) android=$$(pwd)/../android)
 
 avian-static-lib: expat fdlibm icu4c openssl
-ifeq ($(PLATFORM), windows)
+ifeq ($(OS), Windows_NT)
 	(cd android/external/zlib && cp -f ../../../patch/zlib/* .)
 	(cd android/libnativehelper && patch -p1 -N < ../../patch/libnativehelper_jni.h.win32.patch || true)
 endif
 	(cd avian && JAVA_HOME="$(JAVA_HOME)" make arch=$(AVIAN_ARCH) android=$$(pwd)/../android build/$(AVIAN_PLATFORM_TAG)/libavian.a)
 
 avian-classpath: expat fdlibm icu4c openssl
-ifeq ($(PLATFORM), windows)
+ifeq ($(OS), Windows_NT)
 	(cd android/external/zlib && cp -f ../../../patch/zlib/* .)
 	(cd android/libnativehelper && patch -p1 -N < ../../patch/libnativehelper_jni.h.win32.patch || true)
 endif
