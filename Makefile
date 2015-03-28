@@ -26,6 +26,8 @@ else ifeq ($(UNAME), Linux)						# linux on PC
     AVIAN_PLATFORM_TAG_PART=linux-x86_64
   else ifeq ($(ARCH), armv6l)
     AVIAN_PLATFORM_TAG_PART=linux-arm
+  else ifeq ($(ARCH), armv7l)
+    AVIAN_PLATFORM_TAG_PART=linux-arm
   else
     AVIAN_PLATFORM_TAG_PART=linux-unknown
   endif
@@ -46,6 +48,8 @@ endif
 
 AVIAN_ARCH := $(ARCH)
 ifeq ($(AVIAN_ARCH), armv6l)   # Raspberry Pi
+  AVIAN_ARCH := arm
+else ifeq ($(AVIAN_ARCH), armv7l)    # Modern ARM (i.e. Cubieboard 4)
   AVIAN_ARCH := arm
 endif
 
