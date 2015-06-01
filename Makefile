@@ -1,5 +1,7 @@
 UNAME := $(shell uname)
 
+PACKAGE_NAME = avian-pack-$(AVIAN_PLATFORM_TAG)-`git describe`
+
 ifndef CLASSPATH
   CLASSPATH := android
 endif
@@ -16,6 +18,8 @@ ifeq ($(UNAME), Darwin)							# OS X
   CC="gcc -fPIC"
   # In Avian Darwin is now macosx or ios. We use macosx
   AVIAN_PLATFORM_TAG_PART=macosx-x86_64
+  EXE_SUFFIX=
+  SHARED_LIB_SUFFIX=.dylib
 else ifeq ($(UNAME), Linux)						# linux on PC
   JAVA_HOME=$(shell readlink -f `which javac` | sed "s:bin/javac::")
   OPENSSL_CONFIG=./config
@@ -31,6 +35,8 @@ else ifeq ($(UNAME), Linux)						# linux on PC
   else
     AVIAN_PLATFORM_TAG_PART=linux-unknown
   endif
+  EXE_SUFFIX=
+  SHARED_LIB_SUFFIX=.so
 else ifeq ($(OS) $(ARCH), Windows_NT i686)		# Windows 32
   OPENSSL_CONFIG=./Configure mingw
   CFLAGS=
@@ -38,12 +44,16 @@ else ifeq ($(OS) $(ARCH), Windows_NT i686)		# Windows 32
   ARCH=i386
   CC=gcc
   AVIAN_PLATFORM_TAG_PART=windows-i386
+  EXE_SUFFIX=.exe
+  SHARED_LIB_SUFFIX=.dll
 else ifeq ($(OS) $(ARCH), Windows_NT x86_64)	# Windows 64
   OPENSSL_CONFIG=./Configure mingw64
   CFLAGS=
   CXXFLAGS=
   CC=gcc
   AVIAN_PLATFORM_TAG_PART=windows-x86_64
+  EXE_SUFFIX=.exe
+  SHARED_LIB_SUFFIX=.dll
 endif
 
 AVIAN_ARCH := $(ARCH)
@@ -167,4 +177,30 @@ git-clean:
 	git submodule foreach git reset --hard HEAD
 	git submodule foreach git clean -f -d
 
-.PHONY: avian avian-static-lib avian-classpath git-refresh git-clean expat fdlibm icu4c openssl avian-clean expat-clean fdlibm-clean icu4c-clean openssl-clean git-clean
+package: avian
+	@echo Packaging avian-pack...
+	mkdir -p $(PACKAGE_NAME)/avian/build/$(AVIAN_PLATFORM_TAG)/
+	cp -f avian/build/$(AVIAN_PLATFORM_TAG)/avian$(EXE_SUFFIX) $(PACKAGE_NAME)/avian/build/$(AVIAN_PLATFORM_TAG)/
+	cp -f avian/build/$(AVIAN_PLATFORM_TAG)/avian-dynamic$(EXE_SUFFIX) $(PACKAGE_NAME)/avian/build/$(AVIAN_PLATFORM_TAG)/
+	cp -rf avian/build/$(AVIAN_PLATFORM_TAG)/binaryToObject $(PACKAGE_NAME)/avian/build/$(AVIAN_PLATFORM_TAG)/
+	cp -f avian/build/$(AVIAN_PLATFORM_TAG)/classpath.jar $(PACKAGE_NAME)/avian/build/$(AVIAN_PLATFORM_TAG)/
+	cp -f avian/build/$(AVIAN_PLATFORM_TAG)/generator$(EXE_SUFFIX) $(PACKAGE_NAME)/avian/build/$(AVIAN_PLATFORM_TAG)/
+	cp -f avian/build/$(AVIAN_PLATFORM_TAG)/libavian.a $(PACKAGE_NAME)/avian/build/$(AVIAN_PLATFORM_TAG)/
+	cp -f avian/build/$(AVIAN_PLATFORM_TAG)/libjvm$(SHARED_LIB_SUFFIX) $(PACKAGE_NAME)/avian/build/$(AVIAN_PLATFORM_TAG)/
+ifeq ($(OS), Windows_NT)	# Windows 32-bit
+	@echo Archiving the package $(PACKAGE_NAME).zip...
+	( \
+	    cd $(PACKAGE_NAME); \
+	    zip -r ../$(PACKAGE_NAME).zip *;\
+	)
+else
+	@echo Archiving the package $(PACKAGE_NAME).tar.bz2...
+	( \
+	    cd $(PACKAGE_NAME); \
+	    tar -cjf ../$(PACKAGE_NAME).tar.bz2 *;\
+	)
+endif
+	rm -rf $(PACKAGE_NAME)
+
+
+.PHONY: avian avian-static-lib avian-classpath git-refresh git-clean expat fdlibm icu4c openssl avian-clean expat-clean fdlibm-clean icu4c-clean openssl-clean git-clean package
