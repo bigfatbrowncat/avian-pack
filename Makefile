@@ -191,7 +191,31 @@ package: avian
 	cp -f avian/build/$(AVIAN_PLATFORM_TAG)/generator$(EXE_SUFFIX) $(PACKAGE_NAME)/avian/build/$(AVIAN_PLATFORM_TAG)/
 	cp -f avian/build/$(AVIAN_PLATFORM_TAG)/libavian.a $(PACKAGE_NAME)/avian/build/$(AVIAN_PLATFORM_TAG)/
 	cp -f avian/build/$(AVIAN_PLATFORM_TAG)/$(SHARED_LIB_PREFIX)jvm$(SHARED_LIB_SUFFIX) $(PACKAGE_NAME)/avian/build/$(AVIAN_PLATFORM_TAG)/
-ifeq ($(OS), Windows_NT)	# Windows 32-bit
+ifeq ($(CLASSPATH), android)
+ifeq ($(OS), Windows_NT)	# Windows
+		mkdir -p $(PACKAGE_NAME)/android/external/icu4c/lib/
+		cp -f android/external/icu4c/lib/libsicuin.a $(PACKAGE_NAME)/android/external/icu4c/lib/
+		cp -f android/external/icu4c/lib/libsicuuc.a $(PACKAGE_NAME)/android/external/icu4c/lib/
+		cp -f android/external/icu4c/lib/sicudt.a $(PACKAGE_NAME)/android/external/icu4c/lib/
+else
+		mkdir -p $(PACKAGE_NAME)/android/external/icu4c/lib/
+		cp -f android/external/icu4c/lib/libicui18n.a $(PACKAGE_NAME)/android/external/icu4c/lib/
+		cp -f android/external/icu4c/lib/libicuuc.a $(PACKAGE_NAME)/android/external/icu4c/lib/
+		cp -f android/external/icu4c/lib/libicudata.a $(PACKAGE_NAME)/android/external/icu4c/lib/
+endif
+	
+	mkdir -p $(PACKAGE_NAME)/android/external/fdlibm/
+	cp -f android/external/fdlibm/libfdm.a $(PACKAGE_NAME)/android/external/fdlibm/
+	
+	mkdir -p $(PACKAGE_NAME)/android/external/expat/.libs/
+	cp -f android/external/expat/.libs/libexpat.a $(PACKAGE_NAME)/android/external/expat/.libs/
+	
+	mkdir -p $(PACKAGE_NAME)/android/openssl-upstream/
+	cp -f android/openssl-upstream/libssl.a $(PACKAGE_NAME)/android/openssl-upstream/
+	cp -f android/openssl-upstream/libcrypto.a $(PACKAGE_NAME)/android/openssl-upstream/
+endif
+
+ifeq ($(OS), Windows_NT)	# Windows
 	@echo Archiving the package $(PACKAGE_NAME).zip...
 	( \
 	    cd $(PACKAGE_NAME); \
