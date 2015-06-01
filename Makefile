@@ -20,6 +20,7 @@ ifeq ($(UNAME), Darwin)							# OS X
   AVIAN_PLATFORM_TAG_PART=macosx-x86_64
   EXE_SUFFIX=
   SHARED_LIB_SUFFIX=.dylib
+  SHARED_LIB_PREFIX=lib
 else ifeq ($(UNAME), Linux)						# linux on PC
   JAVA_HOME=$(shell readlink -f `which javac` | sed "s:bin/javac::")
   OPENSSL_CONFIG=./config
@@ -37,6 +38,7 @@ else ifeq ($(UNAME), Linux)						# linux on PC
   endif
   EXE_SUFFIX=
   SHARED_LIB_SUFFIX=.so
+  SHARED_LIB_PREFIX=lib
 else ifeq ($(OS) $(ARCH), Windows_NT i686)		# Windows 32
   OPENSSL_CONFIG=./Configure mingw
   CFLAGS=
@@ -46,6 +48,7 @@ else ifeq ($(OS) $(ARCH), Windows_NT i686)		# Windows 32
   AVIAN_PLATFORM_TAG_PART=windows-i386
   EXE_SUFFIX=.exe
   SHARED_LIB_SUFFIX=.dll
+  SHARED_LIB_PREFIX=
 else ifeq ($(OS) $(ARCH), Windows_NT x86_64)	# Windows 64
   OPENSSL_CONFIG=./Configure mingw64
   CFLAGS=
@@ -54,6 +57,7 @@ else ifeq ($(OS) $(ARCH), Windows_NT x86_64)	# Windows 64
   AVIAN_PLATFORM_TAG_PART=windows-x86_64
   EXE_SUFFIX=.exe
   SHARED_LIB_SUFFIX=.dll
+  SHARED_LIB_PREFIX=
 endif
 
 AVIAN_ARCH := $(ARCH)
@@ -186,7 +190,7 @@ package: avian
 	cp -f avian/build/$(AVIAN_PLATFORM_TAG)/classpath.jar $(PACKAGE_NAME)/avian/build/$(AVIAN_PLATFORM_TAG)/
 	cp -f avian/build/$(AVIAN_PLATFORM_TAG)/generator$(EXE_SUFFIX) $(PACKAGE_NAME)/avian/build/$(AVIAN_PLATFORM_TAG)/
 	cp -f avian/build/$(AVIAN_PLATFORM_TAG)/libavian.a $(PACKAGE_NAME)/avian/build/$(AVIAN_PLATFORM_TAG)/
-	cp -f avian/build/$(AVIAN_PLATFORM_TAG)/libjvm$(SHARED_LIB_SUFFIX) $(PACKAGE_NAME)/avian/build/$(AVIAN_PLATFORM_TAG)/
+	cp -f avian/build/$(AVIAN_PLATFORM_TAG)/$(SHARED_LIB_PREFIX)jvm$(SHARED_LIB_SUFFIX) $(PACKAGE_NAME)/avian/build/$(AVIAN_PLATFORM_TAG)/
 ifeq ($(OS), Windows_NT)	# Windows 32-bit
 	@echo Archiving the package $(PACKAGE_NAME).zip...
 	( \
