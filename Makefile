@@ -29,6 +29,8 @@ else ifeq ($(UNAME), Linux)						# linux on PC
   CC="gcc -fPIC"
   ifeq ($(ARCH), x86_64)
     AVIAN_PLATFORM_TAG_PART=linux-x86_64
+  else ifeq ($(ARCH), i686)
+    AVIAN_PLATFORM_TAG_PART=linux-i386
   else ifeq ($(ARCH), armv6l)
     AVIAN_PLATFORM_TAG_PART=linux-arm
   else ifeq ($(ARCH), armv7l)
