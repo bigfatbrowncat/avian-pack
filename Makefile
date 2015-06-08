@@ -36,7 +36,7 @@ else ifeq ($(UNAME), Linux)						# linux on PC
   else ifeq ($(ARCH), armv7l)
     AVIAN_PLATFORM_TAG_PART=linux-arm
   else
-    AVIAN_PLATFORM_TAG_PART=linux-unknown
+    AVIAN_PLATFORM_TAG_PART=linux-$(ARCH)
   endif
   EXE_SUFFIX=
   SHARED_LIB_SUFFIX=.so
