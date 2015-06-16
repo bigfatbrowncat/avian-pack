@@ -67,6 +67,8 @@ ifeq ($(AVIAN_ARCH), armv6l)   # Raspberry Pi
   AVIAN_ARCH := arm
 else ifeq ($(AVIAN_ARCH), armv7l)    # Modern ARM (i.e. Cubieboard 4)
   AVIAN_ARCH := arm
+else ifeq ($(AVIAN_ARCH), i686)    # Intel x86
+  AVIAN_ARCH := i386
 endif
 
 ifeq ($(CLASSPATH), android)
