@@ -21,6 +21,7 @@ ifeq ($(UNAME), Darwin)							# OS X
   EXE_SUFFIX=
   SHARED_LIB_SUFFIX=.dylib
   SHARED_LIB_PREFIX=lib
+  PLATFORM=darwin
 else ifeq ($(UNAME), Linux)						# linux on PC
   JAVA_HOME=$(shell readlink -f `which javac` | sed "s:bin/javac::")
   OPENSSL_CONFIG=./config
@@ -41,6 +42,7 @@ else ifeq ($(UNAME), Linux)						# linux on PC
   EXE_SUFFIX=
   SHARED_LIB_SUFFIX=.so
   SHARED_LIB_PREFIX=lib
+  PLATFORM=linux
 else ifeq ($(OS) $(ARCH), Windows_NT i686)		# Windows 32
   OPENSSL_CONFIG=./Configure mingw
   CFLAGS=
@@ -51,6 +53,7 @@ else ifeq ($(OS) $(ARCH), Windows_NT i686)		# Windows 32
   EXE_SUFFIX=.exe
   SHARED_LIB_SUFFIX=.dll
   SHARED_LIB_PREFIX=
+  PLATFORM=windows
 else ifeq ($(OS) $(ARCH), Windows_NT x86_64)	# Windows 64
   OPENSSL_CONFIG=./Configure mingw64
   CFLAGS=
@@ -60,6 +63,7 @@ else ifeq ($(OS) $(ARCH), Windows_NT x86_64)	# Windows 64
   EXE_SUFFIX=.exe
   SHARED_LIB_SUFFIX=.dll
   SHARED_LIB_PREFIX=
+  PLATFORM=windows
 endif
 
 AVIAN_ARCH := $(ARCH)
@@ -79,25 +83,33 @@ endif
 
 AVIAN_PLATFORM_TAG := $(AVIAN_PLATFORM_TAG_PART)$(AVIAN_PLATFORM_SUFFIX)
 
+all: avian
+
+patch-libcore:
+	(cd android/libcore && \
+	    (for x in ../../patch/luni/*.patch; \
+	        do (patch -p1 -N < $$x || true) \
+	    done) \
+	)
 
 ifeq ($(CLASSPATH), android)
 
-avian: expat fdlibm icu4c openssl
-ifeq ($(OS), Windows_NT)
+avian: expat fdlibm icu4c openssl patch-libcore
+ifeq ($(PLATFORM), windows)
 	(cd android/external/zlib && cp -f ../../../patch/zlib/* .)
 	(cd android/libnativehelper && patch -p1 -N < ../../patch/libnativehelper_jni.h.win32.patch || true)
 endif
 	(cd avian && JAVA_HOME="$(JAVA_HOME)" make arch=$(AVIAN_ARCH) android=$$(pwd)/../android)
 
-avian-static-lib: expat fdlibm icu4c openssl
-ifeq ($(OS), Windows_NT)
+avian-static-lib: expat fdlibm icu4c openssl patch-libcore
+ifeq ($(PLATFORM), windows)
 	(cd android/external/zlib && cp -f ../../../patch/zlib/* .)
 	(cd android/libnativehelper && patch -p1 -N < ../../patch/libnativehelper_jni.h.win32.patch || true)
 endif
 	(cd avian && JAVA_HOME="$(JAVA_HOME)" make arch=$(AVIAN_ARCH) android=$$(pwd)/../android build/$(AVIAN_PLATFORM_TAG)/libavian.a)
 
-avian-classpath: expat fdlibm icu4c openssl
-ifeq ($(OS), Windows_NT)
+avian-classpath: expat fdlibm icu4c openssl patch-libcore
+ifeq ($(PLATFORM), windows)
 	(cd android/external/zlib && cp -f ../../../patch/zlib/* .)
 	(cd android/libnativehelper && patch -p1 -N < ../../patch/libnativehelper_jni.h.win32.patch || true)
 endif
@@ -119,6 +131,12 @@ endif
 
 android/external/expat/Makefile: android/external/expat/Makefile.in
 ifeq ($(PLATFORM), windows)
+	( \
+	    (for x in patch/expat/*.patch; \
+	        do (patch -p1 -N < $$x || true) \
+	    done) \
+	)
+
 	(cd android/external/expat && dos2unix expat_config.h.in)
 endif
 	(cd android/external/expat && CFLAGS="$(CFLAGS)" CXXFLAGS="$(CXXFLAGS)" ./configure --enable-static)
@@ -137,14 +155,7 @@ fdlibm: android/external/fdlibm/Makefile
 	(cd android/external/fdlibm; make)
 
 android/external/icu4c/Makefile: android/external/icu4c/Makefile.in
-ifeq ($(PLATFORM), darwin)
-else ifeq ($(PLATFORM), windows)
-	(cd android/external/expat && \
-	    (for x in ../../../patch/expat/*.patch; \
-	        do patch -p1 < $$x; \
-	    done) \
-	)
-
+ifeq ($(PLATFORM), windows)
 	(cd android/external/icu4c; dos2unix Makefile.in;)
 endif
 	(cd android/external/icu4c; CFLAGS="$(CFLAGS)" CXXFLAGS="$(CXXFLAGS)" ./configure --enable-static;)
@@ -155,14 +166,14 @@ icu4c: android/external/icu4c/Makefile
 android/openssl-upstream/Makefile: android/openssl-upstream/Makefile.org
 	(cd android/openssl-upstream && \
 	    (for x in ../external/openssl/patches/*.patch; \
-	        do patch -p1 < $$x; \
+	        do (patch -p1 -N < $$x || true) \
 	    done) \
 	)
    
 ifeq ($(PLATFORM), windows)
 	(cd android/openssl-upstream && \
 	    (for x in ../../patch/openssl/*.patch; \
-	        do patch -p1 < $$x; \
+	        do patch -p1 -N < $$x; \
 	    done) \
 	)
 
@@ -208,7 +219,7 @@ package: avian
 	cp -f avian/build/$(AVIAN_PLATFORM_TAG)/libavian.a $(PACKAGE_NAME)/avian/build/$(AVIAN_PLATFORM_TAG)/
 	cp -f avian/build/$(AVIAN_PLATFORM_TAG)/$(SHARED_LIB_PREFIX)jvm$(SHARED_LIB_SUFFIX) $(PACKAGE_NAME)/avian/build/$(AVIAN_PLATFORM_TAG)/
 ifeq ($(CLASSPATH), android)
-ifeq ($(OS), Windows_NT)	# Windows
+ifeq ($(PLATFORM), windows)
 		mkdir -p $(PACKAGE_NAME)/android/external/icu4c/lib/
 		cp -f android/external/icu4c/lib/libsicuin.a $(PACKAGE_NAME)/android/external/icu4c/lib/
 		cp -f android/external/icu4c/lib/libsicuuc.a $(PACKAGE_NAME)/android/external/icu4c/lib/
@@ -231,7 +242,7 @@ endif
 	cp -f android/openssl-upstream/libcrypto.a $(PACKAGE_NAME)/android/openssl-upstream/
 endif
 
-ifeq ($(OS), Windows_NT)	# Windows
+ifeq ($(PLATFORM), windows)
 	@echo Archiving the package $(PACKAGE_NAME).zip...
 	( \
 	    cd $(PACKAGE_NAME); \
