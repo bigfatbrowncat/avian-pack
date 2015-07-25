@@ -1,0 +1,13 @@
+diff --git a/android/external/expat/expat_config.h.in b/android/external/expat/expat_config.h.in
+index 8c6e514..358ddcc 100644
+--- a/android/external/expat/expat_config.h.in
++++ b/android/external/expat/expat_config.h.in
+@@ -19,7 +19,7 @@
+ #undef HAVE_INTTYPES_H
+ 
+ /* Define to 1 if you have the `memmove' function. */
+-#undef HAVE_MEMMOVE
++#define HAVE_MEMMOVE	1
+ 
+ /* Define to 1 if you have the <memory.h> header file. */
+ #undef HAVE_MEMORY_H

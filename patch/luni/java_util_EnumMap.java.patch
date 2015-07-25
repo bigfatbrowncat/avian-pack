@@ -1,0 +1,12 @@
+diff --git a/luni/src/main/java/java/util/EnumMap.java b/luni/src/main/java/java/util/EnumMap.java
+index dfacb46..a787dda 100644
+--- a/luni/src/main/java/java/util/EnumMap.java
++++ b/luni/src/main/java/java/util/EnumMap.java
+@@ -159,7 +159,7 @@ public class EnumMap<K extends Enum<K>, V> extends AbstractMap<K, V> implements
+                 throw new NoSuchElementException();
+             }
+             prePosition = position++;
+-            return type.get(new MapEntry(enumMap.keys[prePosition],
++            return (E)type.get(new MapEntry(enumMap.keys[prePosition],
+                     enumMap.values[prePosition]));
+         }

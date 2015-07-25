@@ -1,0 +1,20 @@
+diff --git a/Makefile.org b/Makefile.org
+index c92806f..79ec614 100644
+--- a/Makefile.org
++++ b/Makefile.org
+@@ -142,12 +142,12 @@ SHLIBDIRS= crypto ssl
+ # dirs in crypto to build
+ SDIRS=  \
+ 	objects \
+-	md2 md4 md5 sha mdc2 hmac ripemd whrlpool \
+-	des aes rc2 rc4 rc5 idea bf cast camellia seed modes \
++	md4 md5 sha mdc2 hmac ripemd whrlpool \
++	des aes rc2 rc4 idea bf cast camellia seed modes \
+ 	bn ec rsa dsa ecdsa dh ecdh dso engine \
+ 	buffer bio stack lhash rand err \
+ 	evp asn1 pem x509 x509v3 conf txt_db pkcs7 pkcs12 comp ocsp ui krb5 \
+-	cms pqueue ts jpake srp store cmac
++	cms pqueue ts srp cmac
+ # keep in mind that the above list is adjusted by ./Configure
+ # according to no-xxx arguments...
+ 

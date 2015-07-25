@@ -139,6 +139,12 @@ fdlibm: android/external/fdlibm/Makefile
 android/external/icu4c/Makefile: android/external/icu4c/Makefile.in
 ifeq ($(PLATFORM), darwin)
 else ifeq ($(PLATFORM), windows)
+	(cd android/external/expat && \
+	    (for x in ../../../patch/expat/*.patch; \
+	        do patch -p1 < $$x; \
+	    done) \
+	)
+
 	(cd android/external/icu4c; dos2unix Makefile.in;)
 endif
 	(cd android/external/icu4c; CFLAGS="$(CFLAGS)" CXXFLAGS="$(CXXFLAGS)" ./configure --enable-static;)
@@ -154,6 +160,12 @@ android/openssl-upstream/Makefile: android/openssl-upstream/Makefile.org
 	)
    
 ifeq ($(PLATFORM), windows)
+	(cd android/openssl-upstream && \
+	    (for x in ../../patch/openssl/*.patch; \
+	        do patch -p1 < $$x; \
+	    done) \
+	)
+
 	(cd android/openssl-upstream && dos2unix Makefile.org;)
 endif
 	(cd android/openssl-upstream && CC=$(CC) $(OPENSSL_CONFIG);)
