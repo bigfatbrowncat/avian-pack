@@ -173,7 +173,7 @@ android/openssl-upstream/Makefile: android/openssl-upstream/Makefile.org
 ifeq ($(PLATFORM), windows)
 	(cd android/openssl-upstream && \
 	    (for x in ../../patch/openssl/*.patch; \
-	        do patch -p1 -N < $$x; \
+	        do (patch -p1 -N < $$x || true) \
 	    done) \
 	)
 
